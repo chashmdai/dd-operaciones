@@ -91,19 +91,59 @@ class OperacionesStore {
 
 	@PostConstruct
 	void cargarDatosIniciales() {
-		Tour astroturismo = createTour(new Tour(null, "Astroturismo", "Observacion del cielo atacameno", 12,
+		// --- Tours disponibles (activo=true) ---
+		Tour astroturismo = createTour(new Tour(null, "Astroturismo Atacama", "Observacion del cielo atacameno con telescopios profesionales", 12,
 				new BigDecimal("45000"), true));
-		Tour valleLuna = createTour(new Tour(null, "Valle de la Luna", "Tour de tarde por miradores", 10,
+		Tour valleLuna = createTour(new Tour(null, "Valle de la Luna", "Tour de tarde por miradores y formaciones de sal", 10,
 				new BigDecimal("35000"), true));
+		Tour trekking = createTour(new Tour(null, "Trekking Altiplano", "Caminata por lagunas altoandinas y fauna silvestre", 8,
+				new BigDecimal("55000"), true));
+		Tour sandboard = createTour(new Tour(null, "Sandboard Medanos", "Descenso en tabla por las dunas de arena", 15,
+				new BigDecimal("28000"), true));
 
-		Guia guia = createGuia(new Guia(null, "Camila Rojas", "+56911111111", true));
-		Vehiculo vehiculo = createVehiculo(new Vehiculo(null, "ATC-001", "Van turismo", 12, true));
-		Bicicleta bicicleta = createBicicleta(new Bicicleta(null, "BICI-001", "DISPONIBLE"));
+		// --- Tours no disponibles (activo=false, temporada cerrada o suspendidos) ---
+		Tour tatio = createTour(new Tour(null, "Geysers del Tatio", "Visita al campo geotermal al amanecer", 20,
+				new BigDecimal("65000"), false));
+		Tour laguna = createTour(new Tour(null, "Laguna Cejar y Tebinquinche", "Flotacion en lagunas de sal y atardecer", 12,
+				new BigDecimal("42000"), false));
 
-		createSalida(new SalidaTour(null, astroturismo.id(), LocalDate.now().plusDays(1).toString(), "21:00", "23:30",
-				12, null, "PROGRAMADA", guia.id(), vehiculo.id(), List.of(bicicleta.id())));
-		createSalida(new SalidaTour(null, valleLuna.id(), LocalDate.now().plusDays(2).toString(), "16:00", "19:30",
-				10, null, "PROGRAMADA", null, null, List.of()));
+		// --- Guias ---
+		Guia guia1 = createGuia(new Guia(null, "Camila Rojas", "+56911111111", true));
+		Guia guia2 = createGuia(new Guia(null, "Andres Cifuentes", "+56922222222", true));
+		Guia guia3 = createGuia(new Guia(null, "Lorena Pizarro", "+56933333333", true));
+
+		// --- Vehiculos ---
+		Vehiculo van1 = createVehiculo(new Vehiculo(null, "ATC-001", "Van turismo", 12, true));
+		Vehiculo van2 = createVehiculo(new Vehiculo(null, "ATC-002", "Minibus", 20, true));
+		Vehiculo jeep = createVehiculo(new Vehiculo(null, "ATC-003", "Jeep 4x4", 6, true));
+
+		// --- Bicicletas ---
+		Bicicleta bici1 = createBicicleta(new Bicicleta(null, "BICI-001", "DISPONIBLE"));
+		Bicicleta bici2 = createBicicleta(new Bicicleta(null, "BICI-002", "DISPONIBLE"));
+		Bicicleta bici3 = createBicicleta(new Bicicleta(null, "BICI-003", "MANTENIMIENTO"));
+
+		// --- Salidas programadas (PROGRAMADA) ---
+		createSalida(new SalidaTour(null, astroturismo.id(), LocalDate.now().plusDays(1).toString(),
+				"21:00", "23:30", 12, null, "PROGRAMADA", guia1.id(), van1.id(), List.of(bici1.id())));
+		createSalida(new SalidaTour(null, valleLuna.id(), LocalDate.now().plusDays(2).toString(),
+				"16:00", "19:30", 10, null, "PROGRAMADA", guia2.id(), jeep.id(), List.of()));
+		createSalida(new SalidaTour(null, trekking.id(), LocalDate.now().plusDays(3).toString(),
+				"07:00", "13:00", 8, null, "PROGRAMADA", guia3.id(), jeep.id(), List.of(bici1.id(), bici2.id())));
+		createSalida(new SalidaTour(null, sandboard.id(), LocalDate.now().plusDays(4).toString(),
+				"10:00", "14:00", 15, null, "PROGRAMADA", guia1.id(), van2.id(), List.of()));
+		createSalida(new SalidaTour(null, astroturismo.id(), LocalDate.now().plusDays(5).toString(),
+				"21:00", "23:30", 12, null, "PROGRAMADA", guia2.id(), van1.id(), List.of()));
+		createSalida(new SalidaTour(null, valleLuna.id(), LocalDate.now().plusDays(7).toString(),
+				"16:00", "19:30", 10, null, "PROGRAMADA", null, null, List.of()));
+
+		// --- Salidas canceladas (CANCELADA) ---
+		SalidaTour salidaCancelada1 = createSalida(new SalidaTour(null, trekking.id(),
+				LocalDate.now().minusDays(3).toString(), "07:00", "13:00", 8, null, "PROGRAMADA", guia3.id(), jeep.id(), List.of()));
+		cancelarSalida(salidaCancelada1.id());
+
+		SalidaTour salidaCancelada2 = createSalida(new SalidaTour(null, sandboard.id(),
+				LocalDate.now().minusDays(1).toString(), "10:00", "14:00", 15, null, "PROGRAMADA", guia1.id(), van2.id(), List.of()));
+		cancelarSalida(salidaCancelada2.id());
 	}
 
 	List<Tour> findTours() {
